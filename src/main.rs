@@ -1,4 +1,4 @@
-use std::hash::{Hash, Hasher};
+use std::hash::Hash;
 use std::fmt;
 use std::ops::Add;
 
@@ -32,8 +32,8 @@ fn read_graph<T>(filename : &str) -> Option<Vec<Edge<T>>>
 
     let edges : Vec<Option<Edge<T>>> = s.replace(" ", "").split("\n")
         .map(|x| {
-            let mut x = x.split(",");
-            if let (Some(n1), Some(n2), Some(w)) = (x.next(), x.next(), x.next()) {
+            let x = x.split(",").collect::<Vec<_>>();
+            if let (Some(n1), Some(n2), Some(w)) = (x.get(0), x.get(1), x.get(2)) {
                 match w.trim().parse::<T>() {
                     Ok(num) => Some(Edge::new((n1, n2), num)),
                     Err(_) => None,
