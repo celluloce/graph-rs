@@ -14,7 +14,7 @@ fn main() {
         Edge::new(("E", "F"), 10),
         Edge::new(("E", "G"), 5),
         Edge::new(("F", "G"), 3),
-    ].into_iter().collect();
+    ];
 
     let edges = kruskal::run(edges);
 

@@ -1,7 +1,7 @@
 use std::hash::Hash;
 use std::fmt;
 use std::ops::Add;
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 use graph::Edge;
 
 struct UnionFind {
@@ -10,7 +10,7 @@ struct UnionFind {
 }
 
 impl UnionFind {
-    fn new(nodes : HashSet<String>) -> UnionFind {
+    fn new(nodes : Vec<String>) -> UnionFind {
         let sizes = nodes.iter().map(|x| (x.clone(), 1)).collect();
         let pars = nodes.into_iter().map(|x| (x.clone(), x)).collect();
         UnionFind{pars, sizes}
@@ -66,7 +66,7 @@ impl UnionFind {
 
 fn id<T>(v: T) -> T { v }
 
-pub fn run<T>(edges : HashSet<Edge<T>>) -> HashSet<Edge<T>>
+pub fn run<T>(edges : Vec<Edge<T>>) -> Vec<Edge<T>>
     where T : PartialEq + Hash + Ord + Clone + fmt::Debug + Add
 {
     
@@ -76,7 +76,7 @@ pub fn run<T>(edges : HashSet<Edge<T>>) -> HashSet<Edge<T>>
         edges.into_iter()
     };
 
-    let nodes : HashSet<String> = edges.clone()
+    let nodes = edges.clone()
         .flat_map(|e| {
             let (n1, n2) = e.node;
             vec![n1, n2].into_iter()
@@ -84,7 +84,7 @@ pub fn run<T>(edges : HashSet<Edge<T>>) -> HashSet<Edge<T>>
 
     let mut uf = UnionFind::new(nodes);
 
-    let result : HashSet<Edge<T>> = edges.map(|e| {
+    let result = edges.map(|e| {
         let (n1, n2) = &e.node.clone();
         if let Some(b) = uf.same_tree(n1, n2) {
             if !b {
