@@ -1,36 +1,63 @@
+use std::hash::{Hash, Hasher};
+use std::fmt;
+use std::ops::Add;
+
 extern crate graph;
 use graph::graph::Edge;
 use graph::algorithm::kruskal;
 
-fn main() {
-    let edges = vec![
-        Edge::new(("A", "B"), 4),
-        Edge::new(("A", "C"), 6),
-        Edge::new(("A", "D"), 12),
-        Edge::new(("B", "E"), 2),
-        Edge::new(("C", "D"), 8),
-        Edge::new(("C", "E"), 9),
-        Edge::new(("D", "E"), 3),
-        Edge::new(("E", "F"), 10),
-        Edge::new(("E", "G"), 5),
-        Edge::new(("F", "G"), 3),
-    ];
+fn read_graph<T>(filename : &str) -> Option<Vec<Edge<T>>>
+    where T : PartialEq + Hash + Ord + Clone + fmt::Debug + Add + std::str::FromStr
+{
+    use std::error::Error;
+    use std::fs::File;
+    use std::io::prelude::*;
+    use std::path::Path;
 
-    let edges = kruskal::run(edges);
+    let path = Path::new(filename);
 
-    println!("Total Weight: {}", edges.iter().fold(0, |s, e| s + e.weight));
+    let mut file = match File::open(&path) {
+        Err(why) => {
+            println!("Couldn't open {}: {}", filename, Error::description(&why));
+            return None;
+        },
+        Ok(file) => file,
+    };
 
-    for e in edges.iter() {
-        println!("{:?}", e);
+    let mut s = String::new();
+    if let Err(why) = file.read_to_string(&mut s) {
+        println!("Couldn't read {}: {}", filename, Error::description(&why));
+        return None;
     }
 
-    /*
-    Total Weight: 23
-    Edge(("A", "C"), 6)
-    Edge(("B", "E"), 2)
-    Edge(("F", "G"), 3)
-    Edge(("D", "E"), 3)
-    Edge(("A", "B"), 4)
-    Edge(("E", "G"), 5)
-    */
+    let edges : Vec<Option<Edge<T>>> = s.replace(" ", "").split("\n")
+        .map(|x| {
+            let mut x = x.split(",");
+            if let (Some(n1), Some(n2), Some(w)) = (x.next(), x.next(), x.next()) {
+                match w.trim().parse::<T>() {
+                    Ok(num) => Some(Edge::new((n1, n2), num)),
+                    Err(_) => None,
+                }
+            } else {
+                None
+            }}).collect();
+    
+    if edges.iter().all(|e| e.is_some()) {
+        Some(edges.into_iter().filter_map(|e|e).collect::<Vec<_>>())
+    } else {
+        println!("The file format is not correct");
+        None
+    }
+}
+
+fn main() {
+    if let Some(edges) = read_graph::<usize>("edges.csv") {
+        let edges = kruskal::run(edges);
+
+        println!("Total Weight: {}", edges.iter().fold(0, |s, e| s + e.weight));
+
+        for e in edges.iter() {
+            println!("{:?}", e);
+        }
+    }
 }
