@@ -1,6 +1,3 @@
-use std::hash::Hash;
-use std::fmt;
-use std::ops::Add;
 use std::collections::HashMap;
 use graph::Edge;
 
@@ -66,12 +63,11 @@ impl UnionFind {
 
 fn id<T>(v: T) -> T { v }
 
-pub fn run<T>(edges : Vec<Edge<T>>) -> Vec<Edge<T>>
-    where T : PartialEq + Hash + Ord + Clone + fmt::Debug + Add
+pub fn run(edges : Vec<Edge>) -> Vec<Edge>
 {
     
     let edges = {
-        let mut edges : Vec<Edge<T>> = edges.into_iter().collect();
+        let mut edges : Vec<Edge> = edges.into_iter().collect();
         edges.sort_by_key(|e| e.weight.clone());
         edges.into_iter()
     };

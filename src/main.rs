@@ -1,13 +1,8 @@
-use std::hash::Hash;
-use std::fmt;
-use std::ops::Add;
-
 extern crate graph;
 use graph::graph::Edge;
 use graph::algorithm::kruskal;
 
-fn read_graph<T>(filename : &str) -> Option<Vec<Edge<T>>>
-    where T : PartialEq + Hash + Ord + Clone + fmt::Debug + Add + std::str::FromStr
+fn read_graph(filename : &str) -> Option<Vec<Edge>>
 {
     use std::error::Error;
     use std::fs::File;
@@ -30,11 +25,11 @@ fn read_graph<T>(filename : &str) -> Option<Vec<Edge<T>>>
         return None;
     }
 
-    let edges : Vec<Option<Edge<T>>> = s.replace(" ", "").split("\n")
+    let edges : Vec<Option<Edge>> = s.replace(" ", "").split("\n")
         .map(|x| {
             let x = x.split(",").collect::<Vec<_>>();
             if let (Some(n1), Some(n2), Some(w)) = (x.get(0), x.get(1), x.get(2)) {
-                match w.trim().parse::<T>() {
+                match w.trim().parse() {
                     Ok(num) => Some(Edge::new((n1, n2), num)),
                     Err(_) => None,
                 }
@@ -51,7 +46,7 @@ fn read_graph<T>(filename : &str) -> Option<Vec<Edge<T>>>
 }
 
 fn main() {
-    if let Some(edges) = read_graph::<usize>("edges.csv") {
+    if let Some(edges) = read_graph("edges.csv") {
         let edges = kruskal::run(edges);
 
         println!("Total Weight: {}", edges.iter().fold(0, |s, e| s + e.weight));
