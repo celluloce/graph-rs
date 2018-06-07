@@ -10,14 +10,6 @@ pub struct Edge<T>
     pub weight : T,
 }
 
-impl<T> fmt::Debug for Edge<T>
-    where T : PartialEq + Hash + Ord + Clone + fmt::Debug + Add
-{
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Edge({:?}, {:?})", self.node, self.weight)
-    }
-}
-
 impl<T> Edge<T>
     where T : PartialEq + Hash + Ord + Clone + fmt::Debug + Add
 {
@@ -29,6 +21,13 @@ impl<T> Edge<T>
     }
 }
 
+impl<T> fmt::Debug for Edge<T>
+    where T : PartialEq + Hash + Ord + Clone + fmt::Debug + Add
+{
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "Edge({:?}, {:?})", self.node, self.weight)
+    }
+}
 
 impl<T> PartialEq for Edge<T>
     where T : PartialEq + Hash + Ord + Clone + fmt::Debug + Add
